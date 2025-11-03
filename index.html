@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Image to text OCR demo (mobile & web).">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="img2text">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>img2text</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://unpkg.com/tesseract.js@5.0.3/dist/tesseract.min.js"></script>
+  <script>
+    const MIN_LINE_CONFIDENCE = 60;
+    const MIN_WORD_CONFIDENCE = 70;
+    const MIN_SYMBOL_CONFIDENCE = 65;
+
+    async function flattenImage(source) {
+      const imageElement = await new Promise((resolve, reject) => {
+        const image = new Image();
+        const resolveOnce = () => {
+          image.onload = null;
+          image.onerror = null;
+          resolve(image);
+        };
+        image.onload = resolveOnce;
+        image.onerror = reject;
+        image.src = source;
+        if (image.complete) {
+          resolveOnce();
+        }
+      });
+
+      const width = imageElement.naturalWidth || imageElement.width;
+      const height = imageElement.naturalHeight || imageElement.height;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(imageElement, 0, 0);
+      }
+      return canvas.toDataURL('image/png');
+    }
+
+    window.runTesseract = async function (base64, languages) {
+      if (!window.Tesseract) {
+        throw new Error('Tesseract.js failed to load');
+      }
+      const source = `data:image/png;base64,${base64}`;
+      const flattened = await flattenImage(source);
+
+      const pageSegMode = languages.includes('chi')
+        ? window.Tesseract.PSM.SINGLE_BLOCK
+        : window.Tesseract.PSM.AUTO;
+
+      const { data } = await window.Tesseract.recognize(
+        flattened,
+        languages,
+        {
+          tessedit_pageseg_mode: pageSegMode,
+        },
+      );
+
+      if (!data) {
+        return '';
+      }
+
+      const confidentLines = (data.lines ?? [])
+        .filter((line) => (line.confidence ?? 0) >= MIN_LINE_CONFIDENCE)
+        .map((line) => line.text?.trim() ?? '')
+        .filter(Boolean);
+
+      const trustedWords = confidentLines.length === 0
+        ? (data.words ?? [])
+            .filter((word) => (word.confidence ?? 0) >= MIN_WORD_CONFIDENCE)
+            .map((word) => word.text?.trim() ?? '')
+            .filter(Boolean)
+        : [];
+
+      const trustedSymbols = confidentLines.length === 0 && trustedWords.length === 0
+        ? (data.symbols ?? [])
+            .filter((symbol) => (symbol.confidence ?? 0) >= MIN_SYMBOL_CONFIDENCE)
+            .map((symbol) => symbol.text?.trim() ?? '')
+            .filter(Boolean)
+        : [];
+
+      const primary = confidentLines.length > 0
+        ? confidentLines
+        : trustedWords.length > 0
+            ? trustedWords
+            : trustedSymbols;
+
+      const rawLines = primary.length > 0
+        ? primary
+        : (data.text ?? '')
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+      const unique = Array.from(new Set(rawLines));
+      return unique.join('\n');
+    };
+  </script>
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
