@@ -12,21 +12,25 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png" />
   <link rel="manifest" href="manifest.json" />
 
+  <!-- Google AdSense base (Auto ads + manual units). Keep client as your publisher ID. -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7863416022639310" crossorigin="anonymous"></script>
+  <!-- Optional legacy Auto ads init. Modern Auto ads mainly controlled in AdSense UI; keeping for compatibility. -->
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-pub-7863416022639310",
+      enable_page_level_ads: true
+    });
+  </script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 500:'#239dff', 600:'#0f83e6', 700:'#0c6bb8' }
-          }
-        }
-      }
+      theme: { extend: { colors: { brand: { 500:'#239dff', 600:'#0f83e6', 700:'#0c6bb8' } } } }
     }
   </script>
   <style>
-    .btn{ @apply rounded-xl px-5 py-3 text-sm; }
+    :root { color-scheme: light; }
   </style>
 </head>
 <body class="bg-gradient-to-b from-white to-slate-50 min-h-screen text-slate-800">
@@ -45,7 +49,8 @@
         <a href="#faq" class="hover:text-brand-600" data-i18n="nav.faq">FAQ</a>
       </nav>
       <div class="flex items-center gap-2">
-        <select id="langSwitcher" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">
+        <!-- Language Switcher -->
+        <select id="langSwitcher" class="px-3 py-2 rounded-xl border border-slate-300 text-sm" aria-label="Language">
           <option value="en">EN</option>
           <option value="zh">中文</option>
         </select>
@@ -53,7 +58,13 @@
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- ① Top Leaderboard (replace data-ad-slot with your own slot ID) -->
+  <section class="max-w-6xl mx-auto px-4 mt-4">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7863416022639310" data-ad-slot="7343022178" data-ad-format="horizontal" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </section>
+
+  <!-- Hero / Demo -->
   <section class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10 items-center">
     <div>
       <h2 class="text-4xl font-bold leading-tight" data-i18n="hero.title">Convert Images to Text Instantly</h2>
@@ -61,6 +72,12 @@
       <div class="mt-6 flex gap-3">
         <a href="#demo" class="bg-brand-600 text-white px-5 py-3 rounded-xl shadow hover:bg-brand-700" data-i18n="hero.cta">Try for Free</a>
         <a href="#features" class="border border-slate-300 px-5 py-3 rounded-xl hover:bg-slate-100" data-i18n="hero.secondary">View Features</a>
+      </div>
+
+      <!-- ② In-article under Hero (replace slot) -->
+      <div class="mt-6">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7863416022639310" data-ad-slot="1742145470" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </div>
     </div>
 
@@ -99,12 +116,30 @@
     </div>
   </section>
 
+  <!-- ③ Mid-page In-article (auto) -->
+  <section class="max-w-6xl mx-auto px-4">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7863416022639310" data-ad-slot="5330036690" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </section>
+
+  <!-- ④ Additional In-feed (fluid layout; replace layout-key if AdSense provides one) -->
+  <section class="max-w-6xl mx-auto px-4">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7863416022639310" data-ad-slot="3333333333" data-ad-format="fluid" data-ad-layout-key="-gw-3+1f-3d+2z" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </section>
+
   <!-- Footer -->
   <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-600">
     © <span id="year"></span> Image2Text.Space · <a href="/privacy" class="text-brand-600" data-i18n="footer.privacy">Privacy Policy</a>
   </footer>
 
-  <!-- i18n + OCR logic -->
+  <!-- ⑤ Bottom In-article -->
+  <section class="max-w-6xl mx-auto px-4 mt-6 mb-8">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7863416022639310" data-ad-slot="2786250940" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </section>
+
+  <!-- JS: i18n + OCR (OCR.Space direct). For production, replace API key string. -->
   <script>
     // Year
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -112,73 +147,41 @@
     // i18n dictionaries
     const i18n = {
       en: {
-        'nav.features': 'Features',
-        'nav.try': 'Try Now',
-        'nav.pricing': 'Pricing',
-        'nav.faq': 'FAQ',
+        'nav.features': 'Features','nav.try': 'Try Now','nav.pricing': 'Pricing','nav.faq': 'FAQ',
         'hero.title': 'Convert Images to Text Instantly',
         'hero.subtitle': 'Supports 100+ languages including English, Chinese, Japanese and more. Upload or drag & drop your image to extract text easily.',
-        'hero.cta': 'Try for Free',
-        'hero.secondary': 'View Features',
+        'hero.cta': 'Try for Free','hero.secondary': 'View Features',
         'drop.prompt': "Drag your image here or <label for='file' class='text-brand-600 cursor-pointer'>click to upload</label>",
         'textarea.placeholder': 'Your extracted text will appear here...',
-        'buttons.copy': 'Copy Text',
-        'buttons.clear': 'Clear',
-        'features.title': 'Main Features',
-        'features.fast.title': '⚡ Fast & Accurate',
-        'features.fast.desc': 'Cloud OCR for instant results even with complex backgrounds.',
-        'features.multi.title': '🌍 Multilingual Support',
-        'features.multi.desc': 'Recognize over 100 languages automatically with high accuracy.',
-        'features.secure.title': '🔒 Secure Processing',
-        'features.secure.desc': 'All uploads use HTTPS and are not stored on servers.',
+        'buttons.copy': 'Copy Text','buttons.clear': 'Clear',
+        'features.title': 'Main Features','features.fast.title': '⚡ Fast & Accurate','features.fast.desc': 'Cloud OCR for instant results even with complex backgrounds.',
+        'features.multi.title': '🌍 Multilingual Support','features.multi.desc': 'Recognize over 100 languages automatically with high accuracy.',
+        'features.secure.title': '🔒 Secure Processing','features.secure.desc': 'All uploads use HTTPS and are not stored on servers.',
         'footer.privacy': 'Privacy Policy',
-        '_status.processing': 'Processing...\n',
-        '_status.no_text': 'No text found',
-        '_status.error': 'Error: ',
-        '_status.copied': 'Copied'
+        '_status.processing': 'Processing...\n','_status.no_text': 'No text found','_status.error': 'Error: ','_status.copied': 'Copied'
       },
       zh: {
-        'nav.features': '功能',
-        'nav.try': '在线体验',
-        'nav.pricing': '定价',
-        'nav.faq': '常见问题',
+        'nav.features': '功能','nav.try': '在线体验','nav.pricing': '定价','nav.faq': '常见问题',
         'hero.title': '图片 → 文字，一次拖拽立刻搞定',
         'hero.subtitle': '支持中英日等 100+ 语言。上传或拖拽图片，轻松提取可编辑文字。',
-        'hero.cta': '免费体验',
-        'hero.secondary': '查看功能',
+        'hero.cta': '免费体验','hero.secondary': '查看功能',
         'drop.prompt': "将图片拖到此处，或 <label for='file' class='text-brand-600 cursor-pointer'>点击上传</label>",
         'textarea.placeholder': '识别结果会显示在这里…',
-        'buttons.copy': '复制文字',
-        'buttons.clear': '清空',
-        'features.title': '功能亮点',
-        'features.fast.title': '⚡ 快速准确',
-        'features.fast.desc': '云端识别，复杂背景也能快速返回结果。',
-        'features.multi.title': '🌍 多语言支持',
-        'features.multi.desc': '自动识别 100+ 语言，精度高。',
-        'features.secure.title': '🔒 数据安全',
-        'features.secure.desc': '全程 HTTPS 传输，不保存图片内容。',
+        'buttons.copy': '复制文字','buttons.clear': '清空',
+        'features.title': '功能亮点','features.fast.title': '⚡ 快速准确','features.fast.desc': '云端识别，复杂背景也能快速返回结果。',
+        'features.multi.title': '🌍 多语言支持','features.multi.desc': '自动识别 100+ 语言，精度高。',
+        'features.secure.title': '🔒 数据安全','features.secure.desc': '全程 HTTPS 传输，不保存图片内容。',
         'footer.privacy': '隐私政策',
-        '_status.processing': '正在识别中...\n',
-        '_status.no_text': '未识别到文字',
-        '_status.error': '识别失败：',
-        '_status.copied': '已复制'
+        '_status.processing': '正在识别中...\n','_status.no_text': '未识别到文字','_status.error': '识别失败：','_status.copied': '已复制'
       }
     };
 
-    const el = (sel) => document.querySelector(sel);
-    const els = (sel) => Array.from(document.querySelectorAll(sel));
+    const el = s => document.querySelector(s);
+    const els = s => Array.from(document.querySelectorAll(s));
 
     const applyI18n = (lang) => {
-      // Update text nodes
-      els('[data-i18n]').forEach(node => {
-        const key = node.getAttribute('data-i18n');
-        if (i18n[lang][key] !== undefined) node.innerHTML = i18n[lang][key];
-      });
-      // Update placeholders
-      els('[data-i18n-placeholder]').forEach(node => {
-        const key = node.getAttribute('data-i18n-placeholder');
-        if (i18n[lang][key] !== undefined) node.placeholder = i18n[lang][key];
-      });
+      els('[data-i18n]').forEach(node => { const k = node.getAttribute('data-i18n'); if (i18n[lang][k] !== undefined) node.innerHTML = i18n[lang][k]; });
+      els('[data-i18n-placeholder]').forEach(node => { const k = node.getAttribute('data-i18n-placeholder'); if (i18n[lang][k] !== undefined) node.placeholder = i18n[lang][k]; });
       document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
       localStorage.setItem('i18n', lang);
     };
@@ -189,14 +192,13 @@
     applyI18n(savedLang);
 
     let currentOcrLang = savedLang === 'zh' ? 'chs' : 'eng';
-
     langSwitcher.addEventListener('change', () => {
       const lang = langSwitcher.value;
       applyI18n(lang);
       currentOcrLang = lang === 'zh' ? 'chs' : 'eng';
     });
 
-    // OCR logic
+    // OCR direct call (OCR.Space). Replace API key with your own.
     const dropZone = el('#dropZone');
     const fileInput = el('#file');
     const resultEl = el('#result');
@@ -206,8 +208,13 @@
       resultEl.value = i18n[langSwitcher.value]['_status.processing'];
       const form = new FormData();
       form.append('file', files[0]);
-      form.append('apikey', 'K88329441988957'); // example key, replace with your own
+      form.append('apikey', 'YOUR_REAL_OCR_SPACE_API_KEY'); // TODO: replace with your real key
       form.append('language', currentOcrLang);
+      // Optional tunings:
+      // form.append('OCREngine','2');
+      // form.append('detectOrientation','true');
+      // form.append('scale','true');
+
       try {
         const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: form });
         const data = await res.json();
@@ -217,9 +224,7 @@
       }
     };
 
-    ;['dragenter','dragover','dragleave','drop'].forEach(evt => {
-      dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
-    });
+    ;['dragenter','dragover','dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }));
     dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
     fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
@@ -230,7 +235,7 @@
     el('#clearBtn')?.addEventListener('click', () => resultEl.value = '');
   </script>
 
-  <!-- Flutter bootstrap (must keep) -->
+  <!-- Flutter bootstrap (keep if you still use Flutter; otherwise remove) -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
