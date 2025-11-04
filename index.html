@@ -1,136 +1,236 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Image2Text.Space | Online Image to Text (OCR)</title>
+  <meta name="description" content="Free, fast, and multilingual online OCR tool to extract text from images. Upload or drag & drop images to convert them into editable text instantly." />
+  <meta name="keywords" content="OCR, image to text, text extraction, online OCR, scan text, image reader" />
+  <base href="$FLUTTER_BASE_HREF">
+  <link rel="icon" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7863416022639310"
-     crossorigin="anonymous"></script>
-  <base href="/">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Image to text OCR demo (mobile & web).">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="img2text">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>img2text</title>
-  <link rel="manifest" href="manifest.json">
-  <script src="https://unpkg.com/tesseract.js@5.0.3/dist/tesseract.min.js"></script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    const MIN_LINE_CONFIDENCE = 60;
-    const MIN_WORD_CONFIDENCE = 70;
-    const MIN_SYMBOL_CONFIDENCE = 65;
-
-    async function flattenImage(source) {
-      const imageElement = await new Promise((resolve, reject) => {
-        const image = new Image();
-        const resolveOnce = () => {
-          image.onload = null;
-          image.onerror = null;
-          resolve(image);
-        };
-        image.onload = resolveOnce;
-        image.onerror = reject;
-        image.src = source;
-        if (image.complete) {
-          resolveOnce();
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500:'#239dff', 600:'#0f83e6', 700:'#0c6bb8' }
+          }
         }
-      });
-
-      const width = imageElement.naturalWidth || imageElement.width;
-      const height = imageElement.naturalHeight || imageElement.height;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(imageElement, 0, 0);
       }
-      return canvas.toDataURL('image/png');
     }
-
-    window.runTesseract = async function (base64, languages) {
-      if (!window.Tesseract) {
-        throw new Error('Tesseract.js failed to load');
-      }
-      const source = `data:image/png;base64,${base64}`;
-      const flattened = await flattenImage(source);
-
-      const pageSegMode = languages.includes('chi')
-        ? window.Tesseract.PSM.SINGLE_BLOCK
-        : window.Tesseract.PSM.AUTO;
-
-      const { data } = await window.Tesseract.recognize(
-        flattened,
-        languages,
-        {
-          tessedit_pageseg_mode: pageSegMode,
-        },
-      );
-
-      if (!data) {
-        return '';
-      }
-
-      const confidentLines = (data.lines ?? [])
-        .filter((line) => (line.confidence ?? 0) >= MIN_LINE_CONFIDENCE)
-        .map((line) => line.text?.trim() ?? '')
-        .filter(Boolean);
-
-      const trustedWords = confidentLines.length === 0
-        ? (data.words ?? [])
-            .filter((word) => (word.confidence ?? 0) >= MIN_WORD_CONFIDENCE)
-            .map((word) => word.text?.trim() ?? '')
-            .filter(Boolean)
-        : [];
-
-      const trustedSymbols = confidentLines.length === 0 && trustedWords.length === 0
-        ? (data.symbols ?? [])
-            .filter((symbol) => (symbol.confidence ?? 0) >= MIN_SYMBOL_CONFIDENCE)
-            .map((symbol) => symbol.text?.trim() ?? '')
-            .filter(Boolean)
-        : [];
-
-      const primary = confidentLines.length > 0
-        ? confidentLines
-        : trustedWords.length > 0
-            ? trustedWords
-            : trustedSymbols;
-
-      const rawLines = primary.length > 0
-        ? primary
-        : (data.text ?? '')
-            .split('\n')
-            .map((line) => line.trim())
-            .filter(Boolean);
-
-      const unique = Array.from(new Set(rawLines));
-      return unique.join('\n');
-    };
   </script>
+  <style>
+    .btn{ @apply rounded-xl px-5 py-3 text-sm; }
+  </style>
 </head>
-<body>
+<body class="bg-gradient-to-b from-white to-slate-50 min-h-screen text-slate-800">
+
+  <!-- Header -->
+  <header class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-brand-500 rounded-xl"></div>
+        <h1 class="font-bold text-lg">Image2Text.Space</h1>
+      </div>
+      <nav class="hidden md:flex gap-6 text-sm font-medium">
+        <a href="#features" class="hover:text-brand-600" data-i18n="nav.features">Features</a>
+        <a href="#demo" class="hover:text-brand-600" data-i18n="nav.try">Try Now</a>
+        <a href="#pricing" class="hover:text-brand-600" data-i18n="nav.pricing">Pricing</a>
+        <a href="#faq" class="hover:text-brand-600" data-i18n="nav.faq">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <select id="langSwitcher" class="px-3 py-2 rounded-xl border border-slate-300 text-sm">
+          <option value="en">EN</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <h2 class="text-4xl font-bold leading-tight" data-i18n="hero.title">Convert Images to Text Instantly</h2>
+      <p class="mt-4 text-slate-600" data-i18n="hero.subtitle">Supports 100+ languages including English, Chinese, Japanese and more. Upload or drag & drop your image to extract text easily.</p>
+      <div class="mt-6 flex gap-3">
+        <a href="#demo" class="bg-brand-600 text-white px-5 py-3 rounded-xl shadow hover:bg-brand-700" data-i18n="hero.cta">Try for Free</a>
+        <a href="#features" class="border border-slate-300 px-5 py-3 rounded-xl hover:bg-slate-100" data-i18n="hero.secondary">View Features</a>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white shadow p-6">
+      <div class="aspect-video border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center" id="dropZone">
+        <div class="text-center">
+          <div class="text-5xl">🖼️</div>
+          <p class="mt-2 text-sm" data-i18n="drop.prompt">Drag your image here or <label for='file' class='text-brand-600 cursor-pointer'>click to upload</label></p>
+          <input id="file" type="file" accept="image/*" class="hidden" />
+        </div>
+      </div>
+      <textarea id="result" class="mt-4 w-full min-h-[160px] border border-slate-300 rounded-xl p-3 text-sm" placeholder="Your extracted text will appear here..." data-i18n-placeholder="textarea.placeholder"></textarea>
+      <div class="mt-3 flex gap-3">
+        <button id="copyBtn" class="border border-slate-300 rounded-xl px-4 py-2 text-sm hover:bg-slate-100" data-i18n="buttons.copy">Copy Text</button>
+        <button id="clearBtn" class="border border-slate-300 rounded-xl px-4 py-2 text-sm hover:bg-slate-100" data-i18n="buttons.clear">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-2xl font-bold mb-8" data-i18n="features.title">Main Features</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="p-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <h3 class="font-semibold mb-2" data-i18n="features.fast.title">⚡ Fast & Accurate</h3>
+        <p class="text-sm text-slate-600" data-i18n="features.fast.desc">Cloud OCR for instant results even with complex backgrounds.</p>
+      </div>
+      <div class="p-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <h3 class="font-semibold mb-2" data-i18n="features.multi.title">🌍 Multilingual Support</h3>
+        <p class="text-sm text-slate-600" data-i18n="features.multi.desc">Recognize over 100 languages automatically with high accuracy.</p>
+      </div>
+      <div class="p-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <h3 class="font-semibold mb-2" data-i18n="features.secure.title">🔒 Secure Processing</h3>
+        <p class="text-sm text-slate-600" data-i18n="features.secure.desc">All uploads use HTTPS and are not stored on servers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-600">
+    © <span id="year"></span> Image2Text.Space · <a href="/privacy" class="text-brand-600" data-i18n="footer.privacy">Privacy Policy</a>
+  </footer>
+
+  <!-- i18n + OCR logic -->
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // i18n dictionaries
+    const i18n = {
+      en: {
+        'nav.features': 'Features',
+        'nav.try': 'Try Now',
+        'nav.pricing': 'Pricing',
+        'nav.faq': 'FAQ',
+        'hero.title': 'Convert Images to Text Instantly',
+        'hero.subtitle': 'Supports 100+ languages including English, Chinese, Japanese and more. Upload or drag & drop your image to extract text easily.',
+        'hero.cta': 'Try for Free',
+        'hero.secondary': 'View Features',
+        'drop.prompt': "Drag your image here or <label for='file' class='text-brand-600 cursor-pointer'>click to upload</label>",
+        'textarea.placeholder': 'Your extracted text will appear here...',
+        'buttons.copy': 'Copy Text',
+        'buttons.clear': 'Clear',
+        'features.title': 'Main Features',
+        'features.fast.title': '⚡ Fast & Accurate',
+        'features.fast.desc': 'Cloud OCR for instant results even with complex backgrounds.',
+        'features.multi.title': '🌍 Multilingual Support',
+        'features.multi.desc': 'Recognize over 100 languages automatically with high accuracy.',
+        'features.secure.title': '🔒 Secure Processing',
+        'features.secure.desc': 'All uploads use HTTPS and are not stored on servers.',
+        'footer.privacy': 'Privacy Policy',
+        '_status.processing': 'Processing...\n',
+        '_status.no_text': 'No text found',
+        '_status.error': 'Error: ',
+        '_status.copied': 'Copied'
+      },
+      zh: {
+        'nav.features': '功能',
+        'nav.try': '在线体验',
+        'nav.pricing': '定价',
+        'nav.faq': '常见问题',
+        'hero.title': '图片 → 文字，一次拖拽立刻搞定',
+        'hero.subtitle': '支持中英日等 100+ 语言。上传或拖拽图片，轻松提取可编辑文字。',
+        'hero.cta': '免费体验',
+        'hero.secondary': '查看功能',
+        'drop.prompt': "将图片拖到此处，或 <label for='file' class='text-brand-600 cursor-pointer'>点击上传</label>",
+        'textarea.placeholder': '识别结果会显示在这里…',
+        'buttons.copy': '复制文字',
+        'buttons.clear': '清空',
+        'features.title': '功能亮点',
+        'features.fast.title': '⚡ 快速准确',
+        'features.fast.desc': '云端识别，复杂背景也能快速返回结果。',
+        'features.multi.title': '🌍 多语言支持',
+        'features.multi.desc': '自动识别 100+ 语言，精度高。',
+        'features.secure.title': '🔒 数据安全',
+        'features.secure.desc': '全程 HTTPS 传输，不保存图片内容。',
+        'footer.privacy': '隐私政策',
+        '_status.processing': '正在识别中...\n',
+        '_status.no_text': '未识别到文字',
+        '_status.error': '识别失败：',
+        '_status.copied': '已复制'
+      }
+    };
+
+    const el = (sel) => document.querySelector(sel);
+    const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+    const applyI18n = (lang) => {
+      // Update text nodes
+      els('[data-i18n]').forEach(node => {
+        const key = node.getAttribute('data-i18n');
+        if (i18n[lang][key] !== undefined) node.innerHTML = i18n[lang][key];
+      });
+      // Update placeholders
+      els('[data-i18n-placeholder]').forEach(node => {
+        const key = node.getAttribute('data-i18n-placeholder');
+        if (i18n[lang][key] !== undefined) node.placeholder = i18n[lang][key];
+      });
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      localStorage.setItem('i18n', lang);
+    };
+
+    const langSwitcher = el('#langSwitcher');
+    const savedLang = localStorage.getItem('i18n') || 'en';
+    langSwitcher.value = savedLang;
+    applyI18n(savedLang);
+
+    let currentOcrLang = savedLang === 'zh' ? 'chs' : 'eng';
+
+    langSwitcher.addEventListener('change', () => {
+      const lang = langSwitcher.value;
+      applyI18n(lang);
+      currentOcrLang = lang === 'zh' ? 'chs' : 'eng';
+    });
+
+    // OCR logic
+    const dropZone = el('#dropZone');
+    const fileInput = el('#file');
+    const resultEl = el('#result');
+
+    const handleFiles = async (files) => {
+      if (!files.length) return;
+      resultEl.value = i18n[langSwitcher.value]['_status.processing'];
+      const form = new FormData();
+      form.append('file', files[0]);
+      form.append('apikey', 'K88329441988957'); // example key, replace with your own
+      form.append('language', currentOcrLang);
+      try {
+        const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: form });
+        const data = await res.json();
+        resultEl.value = data.ParsedResults?.[0]?.ParsedText || i18n[langSwitcher.value]['_status.no_text'];
+      } catch (e) {
+        resultEl.value = i18n[langSwitcher.value]['_status.error'] + e.message;
+      }
+    };
+
+    ;['dragenter','dragover','dragleave','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
+    });
+    dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+    fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    el('#copyBtn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(resultEl.value || '');
+      alert(i18n[langSwitcher.value]['_status.copied']);
+    });
+    el('#clearBtn')?.addEventListener('click', () => resultEl.value = '');
+  </script>
+
+  <!-- Flutter bootstrap (must keep) -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
